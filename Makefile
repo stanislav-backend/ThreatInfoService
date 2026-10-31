@@ -42,3 +42,6 @@ migrate-action:
 		-path /migrations \
 		-database postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?sslmode=disable \
 		"$(action)"
+
+run:
+	@go run ./cmd/threatinfoservice
