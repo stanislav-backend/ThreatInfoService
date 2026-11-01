@@ -69,6 +69,24 @@ services:
         condition: service_healthy
       postgres-migrate:
         condition: service_completed_successfully
+  swagger-ui:
+    image: swaggerapi/swagger-ui:v5.17.14
+
+    environment:
+      SWAGGER_JSON: /docs/swagger/openapi.yaml
+    volumes:
+      - ./docs/swagger/openapi.yaml:/docs/swagger/openapi.yaml:ro
+  nginx:
+    image: nginx:alpine
+
+    ports:
+      - "127.0.0.1:8081:8080"
+    volumes:
+      - ./docs/swagger/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+
+    depends_on:
+      - swagger-ui
+      - threatinfoservice
 
 volumes:
   postgres_data:
