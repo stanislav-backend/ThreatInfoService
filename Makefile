@@ -45,3 +45,10 @@ migrate-action:
 
 run:
 	@go run ./cmd/threatinfoservice
+
+
+deploy:
+	@docker compose up -d --build
+
+undeploy:
+	@docker compose down
