@@ -25,15 +25,50 @@ services:
       timeout: 5s
       retries: 5
       start_period: 10s
+
   postgres-migrate:
     image: migrate/migrate:v4.19.1
 
     volumes:
-      - ./migrations:/migrations  
+      - ./migrations:/migrations
+    command:
+      - -path
+      - /migrations
+      - -database
+      - postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?sslmode=disable
+      - up
 
     depends_on:
       postgres:
         condition: service_healthy
+
+  threatinfoservice:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    container_name: threatinfoservice-app
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8080:8080"
+
+    environment:
+      HTTP_ADDR: ":8080"
+      HTTP_SHUTDOWN_TIMEOUT: ${HTTP_SHUTDOWN_TIMEOUT:-30s}
+      LOGGER_LEVEL: ${LOGGER_LEVEL:-DEBUG}
+      LOGGER_FOLDER: /app/logs
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: "5432"
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_TIMEOUT: ${POSTGRES_TIMEOUT:-5s}
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+      postgres-migrate:
+        condition: service_completed_successfully
 
 volumes:
   postgres_data:

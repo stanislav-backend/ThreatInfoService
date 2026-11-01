@@ -1,0 +1,9 @@
+.git
+.env
+.env.example
+.gitignore
+.vscode
+logs
+Makefile
+docker-compose.yml
+migrations
